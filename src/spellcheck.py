@@ -1,14 +1,10 @@
 import mypickle
 import util
 
-import wx
+# words loaded from dict_en.dat.
+gdict = set()
 
-# PY2.4: use a Set object
-# dict of words loaded from dict_en.dat. key = word, value = None.
-gdict = {}
-
-# PY2.4: use a Set object
-# key = util.getWordPrefix(word), value = dict of words beginning with
+# key = util.getWordPrefix(word), value = set of words beginning with
 # that prefix (only words in gdict)
 prefixDict = {}
 
@@ -28,21 +24,21 @@ def loadDict(frame):
 
     for ch1 in chars:
         for ch2 in chars:
-            prefixDict[ch1 + ch2] = {}
+            prefixDict[ch1 + ch2] = set()
 
     gwp = util.getWordPrefix
 
-    for it in lines:
+    for word in lines:
         # theoretically, we should do util.lower(util.toInputStr(it)), but:
         #
         #  -user's aren't supposed to modify the file
         #
         #  -it takes 1.35 secs, compared to 0.56 secs if we don't, on an
         #   1.33GHz Athlon
-        gdict[it] = None
+        gdict.add(word)
 
-        if len(it) > 2:
-            prefixDict[gwp(it)][it] = None
+        if len(word) > 2:
+            prefixDict[gwp(word)].add(word)
 
     return True
 

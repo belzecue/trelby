@@ -9,7 +9,13 @@ import screenplay
 import util
 
 import copy
-import wx
+import os
+
+if "TRELBY_TESTING" in os.environ:
+    import mock
+    wx = mock.Mock()
+else:
+    import wx
 
 # mapping from character to linebreak
 _char2lb = {
@@ -659,7 +665,7 @@ class ConfigGlobal:
         self.types[t.lt] = t
 
         # keyboard commands. these must be in alphabetical order.
-        self.commands = [
+        self.commands = [] if "TRELBY_TESTING" in os.environ else [
             Command("Abort", "Abort something, e.g. selection,"
                     " auto-completion, etc.", [wx.WXK_ESCAPE], isFixed = True),
 
@@ -949,12 +955,6 @@ class ConfigGlobal:
 
             Command("ViewModeLayout", "Change view mode to layout.",
                     isMenu = True),
-
-            Command("ViewModeOverviewLarge", "Change view mode to large"
-                    " overview.", isMenu = True),
-
-            Command("ViewModeOverviewSmall", "Change view mode to small"
-                    " overview.", isMenu = True),
 
             Command("ViewModeSideBySide", "Change view mode to side by"
                     " side.", isMenu = True),
@@ -1349,7 +1349,6 @@ class ConfigGui:
             if s:
                 nfi = wx.NativeFontInfo()
                 nfi.FromString(s)
-                nfi.SetEncoding(wx.FONTENCODING_ISO8859_1)
 
                 fi.font = wx.FontFromNativeInfo(nfi)
 
@@ -1357,9 +1356,6 @@ class ConfigGui:
                 # something equally silly, resulting in an
                 # invalid/non-existent font. on wxGTK2 and wxMSW we can
                 # detect this by checking the point size of the font.
-                # wxGTK1 chooses some weird chinese font and I can't find
-                # a way to detect that, but it's irrelevant since we'll
-                # rip out support for it in a few months.
                 if fi.font.GetPointSize() == 0:
                     fi.font = None
 
